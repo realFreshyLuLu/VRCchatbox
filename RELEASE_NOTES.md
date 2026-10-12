@@ -1,23 +1,20 @@
-# VRC Chatbox 1.4
+# VRC Chatbox 1.4.1
 
-简体中文：无需安装 Python 的 Windows x64 发布版。启动后显示本机与局域网地址，不自动打开网页。新增中英日韩界面和语言保存，支持 MyMemory、DeepL、Azure Translator、OpenAI 兼容翻译。解压完整目录后运行 VRCChatbox.exe。密钥仅保留在当前页面内存中。
+修复 Windows 独立版手机连接时需要手动放行防火墙的问题。
 
-English: Standalone Windows x64 release; no Python installation needed. Startup shows local and LAN addresses without opening a browser. Includes four interface languages with saved preferences, plus MyMemory, DeepL, Azure Translator and OpenAI-compatible translation. Extract the entire archive and run VRCChatbox.exe. Keys stay in the current page's memory only.
+- 启动时自动检查当前程序和 Web 端口的防火墙规则，默认 TCP 5000。
+- 首次运行、移动目录或修改端口后，按需请求 Windows 管理员授权。规则保存后不重复授权。
+- 仅允许本地子网访问当前程序；防火墙助手单独提升权限，网页服务保持普通权限。
+- 取消授权或配置失败时保留本机使用，并在控制台提示；回环绑定不配置规则。
 
-日本語：Python のインストール不要の Windows x64 版です。起動時に PC 用・LAN 用の URL を表示し、ブラウザーは自動起動しません。4 言語の UI と設定保存、MyMemory・DeepL・Azure Translator・OpenAI 互換翻訳に対応。全ファイルを展開して VRCChatbox.exe を起動してください。キーは現在のページのメモリー内でのみ保持します。
+Windows users: startup now checks and configures a persistent LAN-only firewall rule for the current executable and web port. Approve the Windows UAC prompt once when setup is needed. The web server itself is not elevated.
 
-한국어: Python 설치가 필요 없는 Windows x64 배포판입니다. 시작 시 로컬 및 LAN 주소를 표시하며 브라우저를 자동으로 열지 않습니다. 4개 화면 언어와 설정 저장, MyMemory, DeepL, Azure Translator, OpenAI 호환 번역을 지원합니다. 전체 파일을 압축 해제하고 VRCChatbox.exe를 실행하세요. 키는 현재 페이지 메모리에만 유지됩니다.
+## 下载与升级
 
-## Downloads / 下载
+下载 `VRCChatbox-1.4.1-Windows.zip`，退出旧版，解压完整文件夹，将旧版 `config` 文件夹复制到新版目录后运行 `VRCChatbox.exe`。必须保留 `_internal` 文件夹，无需安装 Python。
 
-- `VRCChatbox-1.4-Windows-x64.zip`: complete Windows application / Windows 完整程序。
-- `VRCChatbox-1.4-Source.zip`: matching source and build scripts / 对应源码和构建脚本。
-- `SHA256SUMS.txt`: archive checksums / 压缩包校验值。
+`VRCChatbox-1.4.1-source.zip` 提供对应源码；Windows 包也内附源码。`SHA256SUMS.txt` 提供校验值。
 
-## Validation / 验证范围
+## 验证
 
-Packaged startup, browser language switching and backend regression checks passed. Translation adapters were tested with mocked responses. Real paid API accounts, delivery inside VRChat and physical phone connections have not been fully tested. The executable is not code-signed.
-
-已验证打包启动、浏览器语言切换与后端回归。翻译接口使用模拟响应测试；真实付费账户、VRChat 内接收及实体手机连接尚未完整实测。EXE 未代码签名。
-
-Use a trusted LAN only: no login authentication; HTTP by default. See the README for setup, privacy and migration details.
+19 项测试通过。已实测 Windows UAC 配置与后续免重复授权，并验证打包 EXE 启动及网页 HTTP 200。尚未从实体手机验证连接。程序未代码签名，仅用于可信局域网。

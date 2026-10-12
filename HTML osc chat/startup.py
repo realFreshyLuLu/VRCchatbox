@@ -37,10 +37,12 @@ def serve(app, config):
     from waitress import create_server
     server = create_server(app, host=config['WEB_IP'], port=int(config['WEB_PORT']))
     local, lan = addresses(config['WEB_IP'], config['WEB_PORT'])
-    print('\nVRC Chatbox 1.4\n', flush=True)
+    print('\nVRC Chatbox 1.4.1\n', flush=True)
     for url in local: print('本机 / This computer: '+url, flush=True)
     for url in lan: print('局域网 / LAN devices: '+url, flush=True)
     if not lan: print('LAN: unavailable (loopback binding or no network adapter).', flush=True)
-    print('Open an address manually. Use the same Wi-Fi/LAN; allow private-network firewall access.\nEnable OSC in VRChat. Ctrl+C to stop.\n', flush=True)
+    from firewall import ensure_firewall
+    ensure_firewall(config['WEB_IP'], config['WEB_PORT'])
+    print('Open an address manually. Use the same Wi-Fi/LAN.\nEnable OSC in VRChat. Ctrl+C to stop.\n', flush=True)
     try: server.run()
     finally: server.close()
