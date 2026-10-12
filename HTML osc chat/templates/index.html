@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1324">
+  <meta name="description" content="VRChat OSC Chatbox：手机输入、原文发送、浏览器端翻译与电脑端共享历史。">
+  <title>VRC Chatbox · Web Edition</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body>
+  <script id="server-config" type="application/json">{{ config | tojson }}</script>
+  <div class="app" id="app">
+    <aside class="sidebar" aria-label="主导航">
+      <div class="identity"><div class="logo-mark">◈</div><div><strong>VRC Chatbox</strong><span>VRCHAT COMPANION</span></div></div>
+      <div class="sidebar-caption">工作区</div>
+      <nav class="desktop-nav">
+        <button class="nav-item active" data-view="chat"><span class="nav-icon">◉</span>消息发送</button>
+        <button class="nav-item" data-view="history"><span class="nav-icon">◷</span>发送记录 <em id="historyCount">0</em></button>
+        <button class="nav-item" data-view="quick"><span class="nav-icon">✦</span>快捷短语</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="bridge-info"><span class="live-dot"></span><div><strong>VRChat · OSC</strong><small>HTTP 5000 · OSC 9000（默认）</small></div></div>
+        <button class="sidebar-settings" id="asideSettings">⚙ <span>界面与连接设置</span></button>
+        <p>用电脑或手机输入，轻松连接 VRChat。</p>
+      </div>
+    </aside>
+    <main class="workspace">
+      <header class="topbar">
+        <div class="title-group"><div class="eyebrow" id="viewSubtitle">跨设备文字交流</div><h1 id="viewTitle">消息发送</h1></div>
+        <div class="header-actions">
+          <div class="connection" id="connectionStatus"><span class="live-dot"></span><span id="connectionText">网页已就绪</span></div>
+          <button class="icon-button" id="themeToggle" title="切换深浅色" aria-label="切换深浅色">☾</button>
+          <button class="icon-button" id="openSettings" title="设置" aria-label="设置">⚙</button>
+        </div>
+      </header>
+      <nav class="mobile-nav" aria-label="手机导航">
+        <button class="mobile-item active" data-view="chat">◉ <span>聊天</span></button>
+        <button class="mobile-item" data-view="history">◷ <span>历史</span></button>
+        <button class="mobile-item" data-view="quick">✦ <span>短语</span></button>
+      </nav>
+
+      <section class="view chat-view active" id="view-chat" aria-label="聊天输入">
+        <div class="conversation" id="conversation">
+          <div class="intro-line"><span>LOCAL CHAT PREVIEW</span></div>
+          <div class="sample-message">
+            <div class="assistant-avatar" id="systemAvatar">✦</div>
+            <div class="sample-body"><div class="sender">VRC Chatbox <span class="pill">本地界面</span></div><p>已准备就绪。这里显示保存在电脑上的发送记录，无法接收 VRChat 其他玩家的消息。</p></div>
+          </div>
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="empty-chat" id="emptyChat"><span>⌨</span><p>输入文字，或先点左侧翻译，再点发送。</p></div>
+        </div>
+
+        <div class="compose-zone">
+          <div class="compose-header"><div><strong>新消息</strong><span>在 VRChat 中分享你的想法</span></div><button class="text-action" id="insertQuick">✦ 使用常用短语</button></div>
+          <div class="translate-bar">
+            <div class="language-picker"><label for="sourceLang">源语言</label><select id="sourceLang"><option value="zh-CN">简体中文</option><option value="ja">日本語</option><option value="en">English</option><option value="ko">한국어</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option></select></div>
+            <button class="swap" id="swapLang" title="交换语言" aria-label="交换语言">⇄</button>
+            <div class="language-picker"><label for="targetLang">目标语言</label><select id="targetLang"><option value="ja">日本語</option><option value="zh-CN">简体中文</option><option value="en">English</option><option value="ko">한국어</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option></select></div>
+            <div class="language-picker format-picker"><label for="sendFormat">发送格式</label><select id="sendFormat"><option value="both">原文 + 译文</option><option value="translated">仅译文</option><option value="original">仅原文</option></select></div>
+          </div>
+          <div class="editor"><textarea id="messageInput" placeholder="输入想对 VRChat 中的朋友说的话……" spellcheck="true" enterkeyhint="send"></textarea><div class="editor-footer"><span class="input-hint">Return 发送 · 超限按标点拆分 · Shift+Enter 换行</span><span id="inputCount">0 / 144</span></div></div>
+          <div class="primary-actions"><button class="button button-outline" id="translateButton" type="button">文 / あ 翻译</button><button class="button button-accent" id="directSend" type="button">↗ 发送</button></div>
+          <div class="composer-foot"><span class="server-note">◆ 启用 VRChat 的 OSC 功能后即可发送</span><button id="clearInput" class="link-button">清空输入</button></div>
+        </div>
+      </section>
+
+      <section class="view library-view" id="view-history" aria-label="发送记录" hidden>
+        <div class="library-heading"><div><h2>发送历史</h2><p>保存在电脑上，手机和电脑共享，可编辑、复制或重发。</p></div><div class="tool-row"><button class="button button-outline button-small" id="exportHistory">导出 TXT</button><button class="button button-ghost-danger button-small" id="clearHistory">清空记录</button></div></div>
+        <div id="historyList" class="record-list"></div>
+      </section>
+
+      <section class="view library-view" id="view-quick" aria-label="快捷短语" hidden>
+        <div class="library-heading"><div><h2>常用短语</h2><p>保存在电脑上，所有连接设备共享；直接发送不调用翻译 API。</p></div><span class="pill">最多 100 条</span></div>
+        <div class="quick-add"><textarea id="quickEditor" rows="2" placeholder="例如：请稍等一下，我正在打字……"></textarea><div class="tool-row"><button class="button button-outline button-small" id="cancelQuick" hidden>取消编辑</button><button class="button button-accent button-small" id="saveQuick">新增短语</button></div></div>
+        <div id="quickList" class="record-list"></div>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="settingsBackdrop" hidden>
+    <div class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <header class="settings-head"><div><div class="eyebrow">PREFERENCES</div><h2 id="settingsTitle">设置</h2></div><button id="closeSettings" class="icon-button" aria-label="关闭设置">×</button></header>
+      <div class="settings-scroll">
+        <section class="settings-section"><h3>界面与翻译偏好</h3><p class="hint">偏好自动保存在电脑上，下次打开即可继续使用。</p>
+          <div class="setting-field"><label for="uiLanguage">界面语言</label><select id="uiLanguage"><option value="auto">跟随系统</option><option value="zh-CN">简体中文</option><option value="ja">日本語</option><option value="en">English</option><option value="ko">한국어</option></select></div>
+<div class="setting-field"><label for="translationProvider">翻译服务</label><select id="translationProvider"><option value="mymemory">MyMemory</option><option value="deepl">DeepL</option><option value="azure">Azure Translator</option><option value="openai">OpenAI Compatible</option></select></div>
+<div class="setting-field"><label for="apiKey">API Key</label><input id="apiKey" type="password" autocomplete="off"><small>密钥仅保存在当前浏览器会话中，关闭页面后清除。</small></div>
+<div class="setting-field"><label for="apiEndpoint">API Base URL</label><input id="apiEndpoint" placeholder="https://api.openai.com/v1"><small>DeepL 可填写 https://api-free.deepl.com 或 https://api.deepl.com；其他服务留空使用默认地址。</small></div>
+<div class="setting-field"><label for="apiModel">Model (OpenAI)</label><input id="apiModel" placeholder="gpt-4o-mini"></div>
+<div class="setting-field"><label for="apiRegion">Region (Azure)</label><input id="apiRegion" placeholder="eastasia"></div><label class="toggle-setting"><span><strong>输入状态提示</strong><small>让其他玩家知道你正在输入</small></span><input id="enableTyping" type="checkbox" checked></label>
+
+          <div class="setting-field"><label for="translationEmail">MyMemory Email（可选）</label><input id="translationEmail" type="email" placeholder="可留空，匿名免费翻译"><small>翻译通过电脑访问所选服务；原文发送无需翻译服务。</small></div>
+          <div class="setting-field"><label for="translationOrder">双语顺序</label><select id="translationOrder"><option value="source-first">原文 → 译文</option><option value="translation-first">译文 → 原文</option></select></div>
+        </section>
+        <section class="settings-section"><h3>连接与外观</h3><p class="hint">更改 Web 监听地址或端口后，请重启程序。</p>
+          <form id="originalSettingsForm" enctype="multipart/form-data">
+            <input type="hidden" name="save_config" value="1">
+            <div class="setting-grid">
+              <div class="setting-field"><label for="oscIp">OSC IP</label><input id="oscIp" name="osc_ip" autocomplete="off"></div>
+              <div class="setting-field"><label for="oscPort">OSC 端口</label><input id="oscPort" name="osc_port" type="number" min="1" max="65535"></div>
+              <div class="setting-field"><label for="webIp">Web 监听 IP</label><input id="webIp" name="web_ip" autocomplete="off"></div>
+              <div class="setting-field"><label for="webPort">Web 端口</label><input id="webPort" name="web_port" type="number" min="1" max="65535"></div>
+            </div>
+            <div class="setting-grid colors-grid">
+              <div class="setting-field"><label for="accentColor">主色调</label><input id="accentColor" name="primary_color" type="color"></div>
+              <div class="setting-field"><label for="userBubbleColor">我的气泡</label><input id="userBubbleColor" name="user_bubble_color" type="color"></div>
+              <div class="setting-field"><label for="systemBubbleColor">系统气泡</label><input id="systemBubbleColor" name="system_bubble_color" type="color"></div>
+              <div class="setting-field"><label for="backgroundColor">聊天背景</label><input id="backgroundColor" name="chat_bg_color" type="color"></div>
+              <div class="setting-field"><label for="userAvatarColor">我的头像底色</label><input id="userAvatarColor" name="user_avatar_color" type="color"></div>
+              <div class="setting-field"><label for="systemAvatarColor">系统头像底色</label><input id="systemAvatarColor" name="system_avatar_color" type="color"></div>
+            </div>
+            <div class="setting-grid upload-grid">
+              <div class="setting-field"><label for="userAvatarFile">我的头像</label><input id="userAvatarFile" name="user_avatar" type="file" accept="image/png,image/jpeg,image/gif,image/webp"><label class="tiny-checkbox"><input type="checkbox" name="remove_user_avatar" value="1">删除原头像</label></div>
+              <div class="setting-field"><label for="systemAvatarFile">系统头像</label><input id="systemAvatarFile" name="system_avatar" type="file" accept="image/png,image/jpeg,image/gif,image/webp"><label class="tiny-checkbox"><input type="checkbox" name="remove_system_avatar" value="1">删除原头像</label></div>
+              <div class="setting-field"><label for="backgroundFile">聊天背景图</label><input id="backgroundFile" name="chat_bg_image" type="file" accept="image/png,image/jpeg,image/gif,image/webp"><label class="tiny-checkbox"><input type="checkbox" name="remove_chat_bg_image" value="1">删除背景图片</label></div>
+              <div class="setting-field"><label for="backgroundSize">背景适应方式</label><select id="backgroundSize" name="chat_bg_size"><option value="cover">铺满（cover）</option><option value="contain">完整显示（contain）</option><option value="auto">原始尺寸（auto）</option></select></div>
+            </div>
+            <div class="tool-row settings-save"><button type="submit" id="saveServerSettings" class="button button-accent">保存设置</button></div>
+          </form>
+        </section>
+        <section class="settings-section"><h3>关于与安全</h3><p class="hint">VRC Chatbox 1.4 · 跨设备文字交流。仅在可信局域网使用，请勿将端口开放到公网。发送记录表示已提交，不代表其他玩家已收到。开源许可与来源见 LICENSE 和 NOTICE.md。</p></section>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='i18n.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>

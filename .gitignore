@@ -1,0 +1,25 @@
+# Python environments and generated files
+.venv/
+.buildvenv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Build outputs and release archives
+build/
+dist/
+*.spec
+*.exe
+*.zip
+
+# Runtime data: chat history, preferences and uploaded images
+config/
+HTML osc chat/config/
+
+# Local credentials and editor/OS files
+.env
+.env.*
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

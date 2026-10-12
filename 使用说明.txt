@@ -1,0 +1,12 @@
+VRC Chatbox 1.4
+
+Windows 发布版无需安装 Python。解压完整目录后运行 VRCChatbox.exe，
+保持 _internal 文件夹和 EXE 在同一目录。根据控制台显示的地址手动打开网页。
+
+详细说明 / Documentation / ドキュメント / 문서:
+- README.md       简体中文
+- README.en.md    English
+- README.ja.md    日本語
+- README.ko.md    한국어
+
+从源码运行或构建时需要 Python 3.10+。
