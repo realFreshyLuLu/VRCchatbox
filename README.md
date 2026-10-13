@@ -1,6 +1,6 @@
 # VRC Chatbox
 
-**在电脑或手机上输入，让文字出现在 VRChat 的聊天框中。**
+**适合 VRChat 无言势玩家在 VR 状态下使用手机打字，与朋友交流的工具。**
 
 **简体中文** · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 

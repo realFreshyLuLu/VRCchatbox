@@ -1,6 +1,6 @@
 # VRC Chatbox
 
-**PC やスマートフォンから入力して、VRChat のチャットボックスにメッセージを届けよう。**
+**VRChat の無言勢プレイヤーが、VR 中にスマートフォンで文字を入力してフレンドと交流するためのツールです。**
 
 [简体中文](README.md) · [English](README.en.md) · **日本語** · [한국어](README.ko.md)
 

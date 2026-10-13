@@ -1,6 +1,6 @@
 # VRC Chatbox
 
-**Type on your computer or phone. Share your words in VRChat.**
+**A tool for VRChat players who prefer not to speak, letting them type on their phones to chat with friends while in VR.**
 
 [简体中文](README.md) · **English** · [日本語](README.ja.md) · [한국어](README.ko.md)
 

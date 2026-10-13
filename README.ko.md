@@ -1,6 +1,6 @@
 # VRC Chatbox
 
-**컴퓨터나 휴대폰으로 입력하고, VRChat 채팅창에서 대화하세요.**
+**VRChat에서 음성 대신 텍스트로 소통하는 플레이어가 VR을 사용하는 동안 휴대폰으로 입력해 친구들과 대화할 수 있는 도구입니다.**
 
 [简体中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · **한국어**
 
